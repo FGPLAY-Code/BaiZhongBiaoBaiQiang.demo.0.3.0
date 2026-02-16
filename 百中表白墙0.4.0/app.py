@@ -783,11 +783,19 @@ def handle_appeal():
         # 更新申诉状态
         ip_appeals[ip][appeal_index]['status'] = 'approved' if action == 'approve' else 'rejected'
         
-        # 如果通过申诉，自动解封IP
+        # 如果通过申诉，自动解封IP和用户标识
         if action == 'approve':
-            user_identifier = f"{ip}_ban"
-            if user_identifier in user_offenses:
-                del user_offenses[user_identifier]
+            # 解除IP封禁
+            ip_identifier = f"{ip}_ban"
+            if ip_identifier in user_offenses:
+                del user_offenses[ip_identifier]
+            
+            # 解除基于IP的用户标识封禁
+            # 注意：由于用户标识是基于IP和浏览器信息生成的，这里无法直接获取
+            # 但我们可以遍历所有用户标识，解除与该IP相关的封禁
+            for user_id in list(user_offenses.keys()):
+                if user_id.startswith(ip):
+                    del user_offenses[user_id]
     
     return redirect(url_for('admin_dashboard'))
 
